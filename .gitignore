@@ -11,3 +11,8 @@ app/src/main/assets/Apache-2.0.txt
 app/src/main/assets/THIRD_PARTY.md
 licenses/model-sha256.txt
 licenses/Apache-2.0.txt
+app/libs/*.aar
+app/src/main/assets/whisper-small.zip
+app/src/main/assets/Whisper-MIT.txt
+app/src/main/assets/ONNXRuntime-MIT.txt
+stt-comparison.json
