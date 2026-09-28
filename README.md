@@ -1,4 +1,4 @@
-# 바로 음성 메모
+# 음성 메모 한국어 개선판 (1.1)
 
 Kotlin · Jetpack Compose · MVVM · Room 기반 Android 로컬 음성 메모 프로젝트입니다.
 
@@ -6,7 +6,15 @@ Kotlin · Jetpack Compose · MVVM · Room 기반 Android 로컬 음성 메모 �
 
 저장소: https://github.com/handeulblue-cyber/voice-memo
 
-**2026-09-28 클라우드 빌드 성공:** [테스트 APK ZIP 다운로드](https://github.com/handeulblue-cyber/voice-memo/actions/runs/36388522351/artifacts/10955417231) · [빌드 및 검사 결과](https://github.com/handeulblue-cyber/voice-memo/actions/runs/36388522351). ZIP 약 114 MB. 압축을 풀어 app-debug.apk를 설치하세요. GitHub 로그인이 필요할 수 있습니다.
+**기존 1.0 버전 다운로드(개선판 아님):** [테스트 APK ZIP 다운로드](https://github.com/handeulblue-cyber/voice-memo/actions/runs/36388522351/artifacts/10955417231) · [빌드 및 검사 결과](https://github.com/handeulblue-cyber/voice-memo/actions/runs/36388522351). ZIP 약 114 MB. 압축을 풀어 app-debug.apk를 설치하세요. GitHub 로그인이 필요할 수 있습니다.
+
+이번 개선판은 기존 Vosk로 종료 명령을 처리하고 녹음 후 **Whisper small INT8를 한국어(ko)로 고정하여 기기 안에서 원음을 다시 인식**합니다. 외부 API를 사용하지 않으며 단어를 임의 치환하지 않습니다. 개인 발음을 학습한 모델은 아닙니다.
+
+앱 이름은 **음성 메모 한국어 개선**이며 기존 앱과 함께 설치됩니다. 기존 앱을 삭제하지 않아도 됩니다. 두 앱의 메모 목록은 별개이고 기존 메모는 자동 복사하지 않습니다. 정밀 인식은 64비트 기기가 필요하며, 실패하면 원본 WAV와 기본 인식 결과를 보존합니다.
+
+모델 추가로 APK 용량·설치 공간·메모리 사용량·저장 후 처리 시간이 늘어납니다. 저장 공간 1 GB 이상 여유를 권장합니다. 실제 속도는 기기별로 다릅니다. '녹음 끝' 후 한국어 정밀 인식 안내가 사라지면 목록에서 최종 결과를 확인하세요. 진행률은 처리한 오디오 길이 기준입니다.
+
+**재시험:** '아름다운 선풍기 유리컵, 녹음 끝'을 조용한 환경에서 3회 말해 기존 앱과 비교하세요. '아름다운 유리컵', '선풍기를 켜 주세요' 등 다른 문장도 확인하세요. 실제 사용자 녹음은 제공받지 않아 개인 발음에서의 개선은 미검증입니다.
 
 프로젝트 수정 → main 반영 → GitHub Actions 자동 빌드 → APK 다운로드 → 스마트폰 테스트 흐름입니다. Windows PC에 Android Studio, Android SDK 또는 JDK를 설치할 필요가 없습니다. **클라우드 빌드 결과는 Actions에서 확인할 수 있습니다. 실기기 음성 인식 테스트는 별도로 필요합니다.**
 
@@ -35,7 +43,7 @@ chmod +x gradlew
 ./gradlew --no-daemon --console=plain --stacktrace testDebugUnitTest lintDebug assembleDebug
 ```
 
-Gradle 8.11.1 Wrapper(스크립트/JAR/설정)가 프로젝트에 포함되어 있습니다. AGP 8.9.1, Kotlin 2.1.10, Compose, Room 버전을 명시했습니다. `local.properties` 또는 Windows 절대 경로에 의존하지 않습니다. 모델은 공식 URL에서 빌드 중 받으며 ZIP 무결성과 파일 구조를 검사하고 APK assets에 포함합니다. 모델이 빠지면 preBuild가 실패합니다. APK 생성 후 INTERNET 권한이 없는지, 한국어 모델과 지정 ABI의 Vosk 라이브러리가 포함됐는지 검사합니다.
+Gradle 8.11.1 Wrapper(스크립트/JAR/설정)가 프로젝트에 포함되어 있습니다. AGP 8.9.1, Kotlin 2.1.10, Compose, Room 버전을 명시했습니다. `local.properties` 또는 Windows 절대 경로에 의존하지 않습니다. 모델은 공식 URL에서 빌드 중 받으며 ZIP 무결성과 파일 구조를 검사하고 APK assets에 포함합니다. 모델이 빠지면 preBuild가 실패합니다. APK 생성 후 INTERNET 권한이 없는지, 한국어 모델과 지정 ABI의 Vosk와 sherpa-onnx 라이브러리가 포함됐는지 검사합니다.
 
 Room 저장/삭제/복구는 Robolectric 단위 테스트로 실행하므로 에뮬레이터가 필요하지 않습니다. 테스트·lint 실패 시 성공 APK Artifact를 업로드하지 않습니다. 진단 보고서는 `android-build-reports`에 14일간 보관합니다.
 
@@ -57,7 +65,7 @@ PC 개발 도구 설치로 해결할 필요가 없습니다. GitHub에서 수정
 * AudioRecord 하나에서 16 kHz, 16-bit, mono PCM을 읽어 내부 WAV 파일에 기록합니다. WAV는 일반 재생 가능한 무손실 오디오 형식이며, m4a 대신 강제 종료 복구 용이성을 위해 선택했습니다. 분당 약 1.92 MB입니다.
 * 녹음과 Vosk 처리를 별도 IO 작업으로 실행합니다. 모델 준비 중에도 녹음하며, 모델 로드 후 파일의 앞부분부터 인식합니다.
 * Vosk `acceptWaveForm()`이 발화 종료를 확정한 `result`에 `녹음\s*끝`이 있을 때만 종료합니다. 부분 결과로 종료하지 않습니다. 명령 후 잠시 침묵해야 확정됩니다. 띄어쓰기 없는 `녹음끝`도 허용합니다.
-* 전체 확정 결과를 누적하고 마지막 잔여 음성을 처리하여 저장합니다. 제목/본문에서 종료 명령을 제거하지만 **원본 오디오에서는 제거하지 않습니다**.
+* 원본 WAV와 기본 확정 결과를 먼저 보존한 뒤 정밀 인식 결과로 본문과 제목을 갱신합니다. 28초를 넘는 녹음은 20~28초 구간의 저에너지 지점에서 나누며 모든 샘플을 처리합니다. 경계의 단어는 여전히 오인식될 수 있습니다. 제목/본문에서 종료 명령을 제거하지만 **원본 오디오에서는 제거하지 않습니다**.
 * 제목은 정리된 텍스트 앞 20자, 빈 텍스트는 날짜·시간 제목입니다.
 * Room에는 ID, 제목, 본문, WAV 절대 경로, 녹음 시작 일시, 실제 PCM 길이가 저장됩니다. 최신순 목록, 상세 재생/일시정지/탐색/삭제를 제공합니다.
 * 전경 마이크 서비스와 wake lock으로 백그라운드·화면 꺼짐 중 계속 녹음합니다. 6시간에 자동 저장합니다. 전화 등 오디오 포커스 상실 또는 OS 마이크 차단 감지 시 보존 후 종료합니다.
@@ -69,7 +77,7 @@ PC 개발 도구 설치로 해결할 필요가 없습니다. GitHub에서 수정
 
 Android 8.0(API 26) 이상. compileSdk/targetSdk 35. arm64-v8a, armeabi-v7a, x86_64 ABI를 대상으로 합니다. 기기별 성능/마이크 정책/제조사 절전 정책 및 최신 OS 호환성은 실기기 확인이 필요합니다. STT 모델은 기기 음성 서비스 설치 여부와 무관합니다.
 
-Vosk 모델은 공식 배포 압축 기준 약 82 MB이며 앱 첫 실행 때 내부 noBackupFilesDir로 풉니다. 최초 설치 후 인터넷은 필요하지 않습니다. 설치/압축 해제/녹음 여유를 위해 500 MB 이상 여유 공간을 권장합니다. 인식 정확도는 한국어 발음·소음·마이크·기기 성능에 따라 달라지고 아직 실측하지 않았습니다.
+Vosk 모델은 약 82 MB이고 Whisper 정밀 인식 모델은 수백 MB가 추가됩니다. Vosk 모델은 앱 첫 실행 때 내부 noBackupFilesDir로 풉니다. 최초 설치 후 인터넷은 필요하지 않습니다. 설치/압축 해제/녹음 여유를 위해 1 GB 이상 여유 공간을 권장합니다. 인식 정확도는 한국어 발음·소음·마이크·기기 성능에 따라 달라지고 아직 실측하지 않았습니다.
 
 ## 선택 사항: 개발자가 별도 환경에서 직접 빌드
 
@@ -77,6 +85,7 @@ Vosk 모델은 공식 배포 압축 기준 약 82 MB이며 앱 첫 실행 때 �
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\scripts\prepare.ps1
+python scripts/prepare_model.py
 powershell -ExecutionPolicy Bypass -File .\scripts\build.ps1
 ```
 
@@ -133,6 +142,8 @@ APK를 설치한 뒤 **앱 최초 실행 전에** 비행기 모드를 켜고 Wi-
 * `Data.kt`: Room Entity/DAO/DB, Repository, 제목 및 명령 처리, WAV 헤더/복구.
 * `MemoViewModel.kt`: 목록 StateFlow, 복구 및 UI 명령 연결.
 * `RecordingService.kt`: 전경 녹음, AudioRecord, WAV 저장, 오프라인 STT, 음성 종료, 예외 보존.
+* `KoreanTranscriber.kt`: 한국어 고정 Whisper 정밀 인식, PCM 변환 및 긴 녹음 분할.
+* `scripts/compare_stt.py`: 공개 한국어 음성 4개로 기존/정밀 인식 비교. 사용자 음성은 사용하지 않습니다.
 * `OfflineModel.kt`: APK asset ZIP의 안전한 로컬 압축 해제 및 Vosk 로드.
 * `MainActivity.kt`: Compose 권한 흐름, 녹음/목록/상세, MediaPlayer 재생.
 * `app/src/test/.../MemoTest.kt`: 명령·제목·WAV 복구 단위 테스트.
@@ -152,3 +163,5 @@ INTERNET 권한은 선언하지 않으며 라이브러리에서 추가되더라�
 2026-09-28 GitHub Actions 실행 36388522351에서 Gradle 컴파일, JUnit/Robolectric 단위 테스트, lint, Debug APK 조립이 모두 성공했습니다. 최종 APK의 INTERNET 권한 없음, 한국어 모델 포함, arm64-v8a/armeabi-v7a/x86_64의 Vosk 네이티브 라이브러리 포함 검사도 통과했습니다. Wrapper JAR는 공식 SHA-256과 대조했습니다.
 
 실제 마이크·전화·화면 꺼짐·비행기 모드 한국어 인식률 및 16 KB page-size 기기 동작은 실기기 시험이 필요합니다. 자동 빌드 통과가 이 시험의 완료를 의미하지는 않습니다.
+
+개선판 빌드는 공개 한국어 WAV 4개로 실제 모델 실행을 검사하고 stt-comparison.json을 보고서에 기록합니다. 이 작은 비교는 개인 발음·마이크·소음 환경의 인식률 보장이 아닙니다. Whisper는 무음이나 소음에서 잘못된 문장을 생성할 수 있으므로 원음과 대조해 주세요.
