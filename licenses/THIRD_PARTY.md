@@ -5,7 +5,7 @@
 * 모델 원본: https://alphacephei.com/vosk/models/vosk-model-small-ko-0.22.zip
 * JNA 5.18.1: Apache License 2.0 / LGPL 2.1 이중 라이선스. 본 프로젝트는 Apache 2.0 조건을 사용합니다. https://github.com/java-native-access/jna
 * Whisper small (다국어 모델을 한국어 ko로 고정, INT8 ONNX): MIT License, Copyright (c) 2022 OpenAI. **OpenAI API를 호출하지 않으며 추론은 기기 내부에서만 실행합니다.** https://github.com/openai/whisper/blob/main/LICENSE
-* sherpa-onnx 1.12.14: Apache License 2.0. https://github.com/k2-fsa/sherpa-onnx
+* sherpa-onnx 1.12.26: Apache License 2.0. https://github.com/k2-fsa/sherpa-onnx
 * ONNX Runtime: MIT License. https://github.com/microsoft/onnxruntime/blob/main/LICENSE
 * 변환된 Whisper 배포 파일: https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-whisper-small.tar.bz2
 
