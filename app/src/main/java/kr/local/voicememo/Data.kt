@@ -15,6 +15,8 @@ data class Memo(@PrimaryKey val id: String, val title: String, val text: String,
     @Query("SELECT * FROM memos") suspend fun all(): List<Memo>
     @Insert(onConflict = OnConflictStrategy.IGNORE) suspend fun insert(memo: Memo)
     @Delete suspend fun delete(memo: Memo)
+    @Query("UPDATE memos SET title = :title, text = :text WHERE id = :id")
+    suspend fun updateTranscript(id: String, title: String, text: String)
 }
 @Database(entities = [Memo::class], version = 1, exportSchema = true)
 abstract class MemoDb : RoomDatabase() { abstract fun memos(): MemoDao }
@@ -25,7 +27,10 @@ class MemoApp : Application() {
 object MemoText {
     private val command = Regex("녹음\\s*끝")
     fun hasCommand(finalText: String) = command.containsMatchIn(finalText)
-    fun clean(text: String) = command.replace(text, " ").replace(Regex("\\s+"), " ").trim()
+    fun clean(text: String): String {
+        val cleaned = Regex("녹음\\s*[,，]?\\s*끝").replace(text, " ").replace(Regex("\\s+"), " ").trim()
+        return if (cleaned.all { it.isWhitespace() || it in ".,!?。！？" }) "" else cleaned
+    }
     fun title(text: String, date: Long) = clean(text).take(20).ifBlank { "음성 메모 ${formatDate(date)}" }
 }
 fun formatDate(date: Long): String = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.KOREA).format(Date(date))
@@ -71,5 +76,10 @@ class MemoRepository(private val app: Application, val dao: MemoDao) {
         val audio = File(memo.audioPath)
         check(!audio.exists() || audio.delete()) { "녹음 파일을 삭제하지 못했습니다." }
         File(directory, "${memo.id}.txt").delete(); dao.delete(memo); marker.delete()
+    }
+    suspend fun refine(file: File, text: String, date: Long) {
+        val clean = MemoText.clean(text)
+        // An empty second pass must never erase an already saved transcript.
+        if (clean.isNotBlank()) dao.updateTranscript(file.nameWithoutExtension, MemoText.title(clean, date), clean)
     }
 }
