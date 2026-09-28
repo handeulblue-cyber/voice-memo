@@ -17,6 +17,11 @@ class MemoTest {
     @Test fun shortTitleKeepsWholeText() {
         assertEquals("내일 회의", MemoText.title("내일 회의", 0))
     }
+    @Test fun removesPunctuatedCommandWithoutGuessingUserWords() {
+        assertEquals("", MemoText.clean("녹음 끝."))
+        assertEquals("유리컵", MemoText.clean("유리컵 녹음, 끝"))
+        assertEquals("가수 분사 후 선풍기 유리 터", MemoText.clean("가수 분사 후 선풍기 유리 터"))
+    }
     @Test fun emptyTranscriptUsesRecordingDate() {
         assertEquals("음성 메모 ${formatDate(123456789L)}", MemoText.title("   ", 123456789L))
     }
