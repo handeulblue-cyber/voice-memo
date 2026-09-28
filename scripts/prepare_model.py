@@ -12,8 +12,8 @@ ROOT = Path(__file__).resolve().parents[1]
 ASSETS = ROOT / "app/src/main/assets"
 MODEL_URL = "https://alphacephei.com/vosk/models/vosk-model-small-ko-0.22.zip"
 WHISPER_URL = "https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-whisper-small.tar.bz2"
-SHERPA_URL = "https://github.com/k2-fsa/sherpa-onnx/releases/download/v1.12.14/sherpa-onnx-1.12.14.aar"
-SHERPA_SHA = "5a629a899888cb2760e245d9d5340858b15591aee7fa13644cf57199ff2829b9"
+SHERPA_URL = "https://github.com/k2-fsa/sherpa-onnx/releases/download/v1.12.26/sherpa-onnx-1.12.26.aar"
+SHERPA_SHA = "166b107c707771ceb9a97b9d02e07d47ddd116d1ae22e72aa7ffcbb1f735408f"
 
 
 def download(url: str, target: Path) -> None:
@@ -46,7 +46,7 @@ def main() -> None:
     download("https://raw.githubusercontent.com/microsoft/onnxruntime/v1.17.1/LICENSE", ASSETS / "ONNXRuntime-MIT.txt")
     libraries = ROOT / "app/libs"
     libraries.mkdir(parents=True, exist_ok=True)
-    aar = libraries / "sherpa-onnx-1.12.14.aar"
+    aar = libraries / "sherpa-onnx-1.12.26.aar"
     download(SHERPA_URL, aar)
     assert hashlib.sha256(aar.read_bytes()).hexdigest() == SHERPA_SHA, "sherpa-onnx checksum mismatch"
     with tempfile.TemporaryDirectory() as temporary:
@@ -61,7 +61,7 @@ def main() -> None:
                     shutil.copyfileobj(source, out)
     whisper_hash = hashlib.sha256((ASSETS / "whisper-small.zip").read_bytes()).hexdigest()
     with (ROOT / "licenses/model-sha256.txt").open("a", encoding="utf-8") as out:
-        out.write(f"{whisper_hash}  whisper-small.zip\n{SHERPA_SHA}  sherpa-onnx-1.12.14.aar\n")
+        out.write(f"{whisper_hash}  whisper-small.zip\n{SHERPA_SHA}  sherpa-onnx-1.12.26.aar\n")
     shutil.copyfile(ROOT / "licenses/THIRD_PARTY.md", ASSETS / "THIRD_PARTY.md")
     print(f"Bundled model verified, SHA-256: {digest}")
     print(f"Bundled Korean second-pass model: {whisper_hash}")
