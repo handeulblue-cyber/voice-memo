@@ -65,7 +65,7 @@ class MainActivity : ComponentActivity() {
         if (ready && !vm.autoStartHandled) { vm.autoStartHandled = true; if (!rec.active) start() }
     }
     BackHandler(rec.active || selectedId != null) {
-        if (rec.active) vm.stop(true) else selectedId = null
+        if (rec.active) { if (!rec.saving) vm.stop(true) } else selectedId = null
     }
     Column(Modifier.fillMaxSize().safeDrawingPadding().padding(horizontal = 24.dp)) {
         if (error.isNotBlank()) {
@@ -76,7 +76,8 @@ class MainActivity : ComponentActivity() {
             !ready -> { Spacer(Modifier.height(80.dp)); CircularProgressIndicator(); Text("이전 녹음 확인 중…") }
             rec.active -> {
                 Column(Modifier.weight(1f).fillMaxWidth().verticalScroll(rememberScrollState()), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center) {
-                    Icon(Icons.Default.Mic, contentDescription = "녹음 중", tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(128.dp))
+                    if (rec.saving) CircularProgressIndicator(modifier = Modifier.size(96.dp))
+                    else Icon(Icons.Default.Mic, contentDescription = "녹음 중", tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(128.dp))
                     Spacer(Modifier.height(28.dp))
                     Text(if (rec.saving) "저장하고 있습니다…" else "듣고 있습니다...", fontSize = 28.sp, fontWeight = FontWeight.Bold)
                     Spacer(Modifier.height(16.dp)); Text("'녹음 끝'이라고 말하면 저장됩니다.")
