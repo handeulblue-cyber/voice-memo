@@ -1,0 +1,13 @@
+.tools/
+.gradle/
+.kotlin/
+local.properties
+**/build/
+*.iml
+.idea/
+dist/
+app/src/main/assets/korean.zip
+app/src/main/assets/Apache-2.0.txt
+app/src/main/assets/THIRD_PARTY.md
+licenses/model-sha256.txt
+licenses/Apache-2.0.txt
