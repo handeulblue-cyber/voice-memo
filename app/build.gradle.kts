@@ -36,7 +36,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.1")
     implementation("com.alphacephei:vosk-android:0.3.75@aar")
     implementation("net.java.dev.jna:jna:5.18.1@aar")
-    implementation(files("libs/sherpa-onnx-1.12.14.aar"))
+    implementation(files("libs/sherpa-onnx-1.12.26.aar"))
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.robolectric:robolectric:4.14.1")
     testImplementation("androidx.test:core:1.6.1")
@@ -49,7 +49,7 @@ tasks.register("verifyOfflineModel") {
             "Bundled Korean model is missing. Run python scripts/prepare_model.py before building."
         }
         check(file("src/main/assets/whisper-small.zip").length() > 100_000_000) { "Whisper model is missing" }
-        check(file("libs/sherpa-onnx-1.12.14.aar").exists()) { "Local sherpa-onnx runtime is missing" }
+        check(file("libs/sherpa-onnx-1.12.26.aar").exists()) { "Local sherpa-onnx runtime is missing" }
     }
 }
 tasks.named("preBuild").configure { dependsOn("verifyOfflineModel") }
