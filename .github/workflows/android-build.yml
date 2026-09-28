@@ -21,12 +21,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Set up JDK 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '17'
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
+          log-accepted-android-sdk-licenses: false
       - name: Install SDK 35
         run: sdkmanager 'platforms;android-35' 'build-tools;35.0.0'
       - name: Ensure official Gradle Wrapper JAR
@@ -85,24 +88,3 @@ jobs:
           if-no-files-found: ignore
           retention-days: 14
 
-  # The connector writes UTF-8 files. This one-time job adds the verified binary
-  # wrapper to Git without requiring a developer PC or changing its credentials.
-  persist-wrapper:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    runs-on: ubuntu-24.04
-    permissions:
-      contents: write
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: main
-      - name: Commit official wrapper if missing
-        run: |
-          if [ -f gradle/wrapper/gradle-wrapper.jar ]; then exit 0; fi
-          curl --fail --location --retry 3 https://raw.githubusercontent.com/gradle/gradle/v8.11.1/gradle/wrapper/gradle-wrapper.jar -o gradle/wrapper/gradle-wrapper.jar
-          echo '2db75c40782f5e8ba1fc278a5574bab070adccb2d21ca5a6e5ed840888448046  gradle/wrapper/gradle-wrapper.jar' | sha256sum --check
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add gradle/wrapper/gradle-wrapper.jar
-          git commit -m 'Add checksum-verified Gradle Wrapper binary'
-          git push origin HEAD:main
