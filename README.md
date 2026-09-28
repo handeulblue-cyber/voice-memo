@@ -6,6 +6,8 @@ Kotlin · Jetpack Compose · MVVM · Room 기반 Android 로컬 음성 메모 �
 
 저장소: https://github.com/handeulblue-cyber/voice-memo
 
+**2026-09-28 클라우드 빌드 성공:** [테스트 APK ZIP 다운로드](https://github.com/handeulblue-cyber/voice-memo/actions/runs/36388522351/artifacts/10955417231) · [빌드 및 검사 결과](https://github.com/handeulblue-cyber/voice-memo/actions/runs/36388522351). ZIP 약 114 MB. 압축을 풀어 app-debug.apk를 설치하세요. GitHub 로그인이 필요할 수 있습니다.
+
 프로젝트 수정 → main 반영 → GitHub Actions 자동 빌드 → APK 다운로드 → 스마트폰 테스트 흐름입니다. Windows PC에 Android Studio, Android SDK 또는 JDK를 설치할 필요가 없습니다. **클라우드 빌드 결과는 Actions에서 확인할 수 있습니다. 실기기 음성 인식 테스트는 별도로 필요합니다.**
 
 1. GitHub에 로그인하고 위 저장소에 접속합니다.
@@ -147,4 +149,6 @@ INTERNET 권한은 선언하지 않으며 라이브러리에서 추가되더라�
 
 ## 검증 기록
 
-현재 XML/PowerShell/Python/셸/워크플로 구문과 Wrapper JAR 공식 SHA-256을 정적으로 확인했습니다. Gradle 컴파일, JUnit, lint, APK 권한 검사, native library 16 KB page-size 기기 호환성, 실제 마이크·전화·화면 꺼짐·오프라인 한국어 인식 시험은 수행하지 않았습니다. 앞의 자동 검증은 GitHub Actions 실행 시 수행됩니다. 아직 빌드·실기기 테스트 완료된 앱으로 간주하지 마세요.
+2026-09-28 GitHub Actions 실행 36388522351에서 Gradle 컴파일, JUnit/Robolectric 단위 테스트, lint, Debug APK 조립이 모두 성공했습니다. 최종 APK의 INTERNET 권한 없음, 한국어 모델 포함, arm64-v8a/armeabi-v7a/x86_64의 Vosk 네이티브 라이브러리 포함 검사도 통과했습니다. Wrapper JAR는 공식 SHA-256과 대조했습니다.
+
+실제 마이크·전화·화면 꺼짐·비행기 모드 한국어 인식률 및 16 KB page-size 기기 동작은 실기기 시험이 필요합니다. 자동 빌드 통과가 이 시험의 완료를 의미하지는 않습니다.
