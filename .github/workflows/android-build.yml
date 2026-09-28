@@ -40,12 +40,16 @@ jobs:
           echo '2db75c40782f5e8ba1fc278a5574bab070adccb2d21ca5a6e5ed840888448046  gradle/wrapper/gradle-wrapper.jar' | sha256sum --check
       - name: Validate wrapper and configure Gradle cache
         uses: gradle/actions/setup-gradle@v4
+      - name: Set up Python 3.11 for speech model checks
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
       - name: Prepare bundled offline Korean model
         run: python3 scripts/prepare_model.py
       - name: Compare offline Korean recognition on public samples
         run: |
           python3 -m venv /tmp/stt-test
-          /tmp/stt-test/bin/pip install sherpa-onnx==1.12.14 vosk==0.3.45 numpy
+          /tmp/stt-test/bin/pip install sherpa-onnx==1.12.26 vosk==0.3.45 numpy
           /tmp/stt-test/bin/python scripts/compare_stt.py
       - name: Make wrapper executable
         run: chmod +x gradlew
