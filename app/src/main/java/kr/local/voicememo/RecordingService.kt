@@ -153,7 +153,25 @@ class RecordingService : Service() {
                 if (cancelled) {
                     val marker = File(repo.directory, file.nameWithoutExtension + ".deleted").apply { writeText("") }
                     check(!file.exists() || file.delete()); transcript.delete(); marker.delete()
-                } else if (file.exists()) repo.save(file, result, date)
+                } else if (file.exists()) {
+                    // Save the original WAV and first transcript before expensive inference.
+                    // Force-stop/model failure therefore cannot discard the recording.
+                    repo.save(file, result, date)
+                    if (file.exists() && file.length() > 44) {
+                        state.update { it.copy(message = "기기에서 한국어를 다시 인식하고 있습니다…") }
+                        try {
+                            val refined = KoreanTranscriber(this@RecordingService).transcribe(file) { percent ->
+                                state.update { it.copy(message = "한국어 정밀 인식 $percent% · 녹음은 안전하게 저장됐습니다.") }
+                            }
+                            repo.refine(file, refined, date)
+                            state.update { it.copy(text = MemoText.clean(refined).ifBlank { it.text }, message = "") }
+                        } catch (e: Throwable) {
+                            if (e is CancellationException) throw e
+                            if (e !is Exception && e !is LinkageError && e !is OutOfMemoryError) throw e
+                            problem = "한국어 정밀 인식을 완료하지 못해 기본 인식 결과와 원본 녹음을 보존했습니다."
+                        }
+                    }
+                }
             } catch (e: Exception) { problem = "저장을 완료하지 못했습니다. 다음 실행 때 녹음 복구를 다시 시도합니다." }
             state.update { it.copy(active = false, saving = false, message = problem.ifBlank { it.message }, completed = System.currentTimeMillis()) }
             withContext(Dispatchers.Main) { stopForeground(STOP_FOREGROUND_REMOVE); stopSelf() }
