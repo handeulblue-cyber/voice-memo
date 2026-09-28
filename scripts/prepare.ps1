@@ -70,3 +70,4 @@ try {
     if ($LASTEXITCODE -ne 0) { throw 'Gradle wrapper generation failed' }
 } finally { Pop-Location }
 Write-Host 'Preparation complete. Run scripts/build.ps1'
+Write-Host 'For the Korean edition, also run: python scripts/prepare_model.py (Python 3 required).'
