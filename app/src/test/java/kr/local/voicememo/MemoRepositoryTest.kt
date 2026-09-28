@@ -65,4 +65,13 @@ class MemoRepositoryTest {
         repo.save(audio("2000_new"), "최신 메모", 2000)
         assertEquals(listOf("2000_new", "1000_old"), db.memos().observe().first().map { it.id })
     }
+    @Test fun secondPassUpdatesTextWithoutLosingOriginalAudio() = runBlocking {
+        val file = audio("1000_refine")
+        repo.save(file, "기본 인식", 1000)
+        repo.refine(file, "아름다운 선풍기 유리컵", 1000)
+        assertEquals("아름다운 선풍기 유리컵", db.memos().all().single().text)
+        assertEquals(32044L, file.length())
+        repo.refine(file, "", 1000)
+        assertEquals("아름다운 선풍기 유리컵", db.memos().all().single().text)
+    }
 }
