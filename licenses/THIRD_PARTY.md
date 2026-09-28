@@ -4,6 +4,12 @@
 * 한국어 모델 `vosk-model-small-ko-0.22`: 공식 모델 목록에서 Apache License 2.0으로 표시. 압축 다운로드 약 82 MB. https://alphacephei.com/vosk/models
 * 모델 원본: https://alphacephei.com/vosk/models/vosk-model-small-ko-0.22.zip
 * JNA 5.18.1: Apache License 2.0 / LGPL 2.1 이중 라이선스. 본 프로젝트는 Apache 2.0 조건을 사용합니다. https://github.com/java-native-access/jna
+* Whisper small (다국어 모델을 한국어 ko로 고정, INT8 ONNX): MIT License, Copyright (c) 2022 OpenAI. **OpenAI API를 호출하지 않으며 추론은 기기 내부에서만 실행합니다.** https://github.com/openai/whisper/blob/main/LICENSE
+* sherpa-onnx 1.12.14: Apache License 2.0. https://github.com/k2-fsa/sherpa-onnx
+* ONNX Runtime: MIT License. https://github.com/microsoft/onnxruntime/blob/main/LICENSE
+* 변환된 Whisper 배포 파일: https://github.com/k2-fsa/sherpa-onnx/releases/download/asr-models/sherpa-onnx-whisper-small.tar.bz2
+
+원본의 정수 양자화 encoder/decoder와 tokens 파일만 APK의 whisper-small.zip에 포함합니다. prepare_model.py는 Whisper 및 ONNX Runtime의 MIT 전문도 APK에 포함합니다. sherpa-onnx AAR는 GitHub release에서 제공하는 SHA-256과 대조합니다.
 * AndroidX / Jetpack Compose / Room: Apache License 2.0. https://android.googlesource.com/platform/frameworks/support/
 * Kotlin / kotlinx.coroutines: Apache License 2.0. https://github.com/Kotlin/kotlinx.coroutines
 
