@@ -10,6 +10,8 @@ class MemoTest {
         assertTrue(MemoText.hasCommand("내일 우유 구매 녹음 끝"))
         assertTrue(MemoText.hasCommand("녹음끝"))
         assertFalse(MemoText.hasCommand("녹음 끄기"))
+        assertFalse(MemoText.hasCommand("녹음 끝까지 듣기"))
+        assertEquals("녹음 끝까지 듣기", MemoText.clean("녹음 끝까지 듣기"))
         assertEquals("내일 우유 구매", MemoText.clean("내일 우유 구매 녹음 끝"))
         assertEquals(20, MemoText.title("가".repeat(30), 0).length)
         assertTrue(MemoText.title("녹음 끝", 0).startsWith("음성 메모 "))
