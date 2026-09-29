@@ -23,7 +23,7 @@ class StopCommand(model: Model) : AutoCloseable {
 
     data class Word(val text: String, val confidence: Double)
     companion object {
-        const val GRAMMAR = "[\"녹음 끝\", \"[unk]\"]"
+        const val GRAMMAR = "[\"녹음 끝\", \"<UNK>\"]"
         private const val MIN_CONFIDENCE = 0.85
 
         fun accepts(text: String, words: List<Word>, isFinal: Boolean): Boolean {
