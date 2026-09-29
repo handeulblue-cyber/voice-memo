@@ -38,10 +38,10 @@ def main():
             archive.extractall(target / "whisper")
         vosk.SetLogLevel(-1)
         baseline = vosk.Model(str(target / "vosk-model-small-ko-0.22"))
-        for word in ["녹음", "끝", "[unk]"]:
+        for word in ["녹음", "끝", "<UNK>"]:
             assert baseline.vosk_model_find_word(word) >= 0, f"Missing command vocabulary: {word}"
         def check_no_command(data):
-            command = vosk.KaldiRecognizer(baseline, 16000, json.dumps(["녹음 끝", "[unk]"], ensure_ascii=False))
+            command = vosk.KaldiRecognizer(baseline, 16000, json.dumps(["녹음 끝", "<UNK>"], ensure_ascii=False))
             command.SetWords(True)
             # Feed trailing silence to exercise natural endpoint finals, like the app.
             data += bytes(16000 * 2 * 3)
