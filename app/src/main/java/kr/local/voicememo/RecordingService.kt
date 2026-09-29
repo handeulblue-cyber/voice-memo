@@ -99,18 +99,27 @@ class RecordingService : Service() {
                                         if (detect && MemoText.hasCommand(text)) stopping = true
                                     }
                                 }
-                                RandomAccessFile(file, "r").use { input ->
+                                // Failure of the optional narrow decoder must not disable dictation.
+                                var command: StopCommand? = try { StopCommand(model) } catch (_: Exception) { null }
+                                try { RandomAccessFile(file, "r").use { input ->
                                     input.seek(44)
                                     val buffer = ByteArray(8000)
                                     while (!cancelled) {
                                         val available = ((input.length() - input.filePointer).coerceAtLeast(0).toInt() / 2) * 2
                                         if (available > 0) {
                                             val n = input.read(buffer, 0, minOf(available, buffer.size))
-                                            if (n > 0 && recognizer.acceptWaveForm(buffer, n)) append(recognizer.result, true)
+                                            if (n > 0) {
+                                                if (recognizer.acceptWaveForm(buffer, n)) append(recognizer.result, true)
+                                                try {
+                                                    if (command?.accept(buffer, n) == true) stopping = true
+                                                } catch (_: Exception) {
+                                                    command?.close(); command = null
+                                                }
+                                            }
                                         } else if (captured) break else delay(30)
                                     }
                                     if (!cancelled) append(recognizer.finalResult, false)
-                                }
+                                } } finally { command?.close() }
                             }
                         }
                     } catch (e: Throwable) {
