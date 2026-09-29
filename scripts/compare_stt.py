@@ -38,6 +38,26 @@ def main():
             archive.extractall(target / "whisper")
         vosk.SetLogLevel(-1)
         baseline = vosk.Model(str(target / "vosk-model-small-ko-0.22"))
+        for word in ["녹음", "끝", "[unk]"]:
+            assert baseline.vosk_model_find_word(word) >= 0, f"Missing command vocabulary: {word}"
+        def check_no_command(data):
+            command = vosk.KaldiRecognizer(baseline, 16000, json.dumps(["녹음 끝", "[unk]"], ensure_ascii=False))
+            command.SetWords(True)
+            # Feed trailing silence to exercise natural endpoint finals, like the app.
+            data += bytes(16000 * 2 * 3)
+            finals = []
+            for start in range(0, len(data), 8000):
+                if command.AcceptWaveform(data[start:start + 8000]):
+                    result = json.loads(command.Result())
+                    finals.append(result)
+                    words = result.get("result", [])
+                    recognized = [w["word"] for w in words]
+                    stop = (re.sub(r"\s+", "", result.get("text", "")) == "녹음끝"
+                            and recognized in [["녹음", "끝"], ["녹음끝"]]
+                            and all(0.85 <= w.get("conf", 0) <= 1 for w in words))
+                    assert not stop, f"False command on negative sample: {result}"
+            return finals
+        check_no_command(bytes(16000 * 2 * 5))
         whisper = target / "whisper"
         improved = sherpa_onnx.OfflineRecognizer.from_whisper(
             encoder=str(whisper / "small-encoder.int8.onnx"),
@@ -52,6 +72,7 @@ def main():
                 rate = source.getframerate()
                 data = source.readframes(source.getnframes())
             assert rate == 16000
+            command_finals = check_no_command(data)
             rec = vosk.KaldiRecognizer(baseline, rate)
             final_parts = []
             for start in range(0, len(data), 8000):
@@ -65,7 +86,8 @@ def main():
             new = stream.result.text.strip()
             assert re.search(r"[가-힣]", new), "Korean inference returned no Hangul"
             row = dict(reference=reference, vosk=old, whisper=new, characters=len(chars(reference)),
-                       vosk_errors=distance(chars(reference), chars(old)), whisper_errors=distance(chars(reference), chars(new)))
+                       vosk_errors=distance(chars(reference), chars(old)), whisper_errors=distance(chars(reference), chars(new)),
+                       command_negative_finals=command_finals)
             rows.append(row)
             print(json.dumps(row, ensure_ascii=False), flush=True)
     report = {"scope": "Four public clean samples only; personal pronunciation untested", "samples": rows}
