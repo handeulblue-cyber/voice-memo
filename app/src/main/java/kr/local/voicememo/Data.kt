@@ -25,10 +25,10 @@ class MemoApp : Application() {
     val repository by lazy { MemoRepository(this, db.memos()) }
 }
 object MemoText {
-    private val command = Regex("녹음\\s*끝")
+    private val command = Regex("녹음\\s*끝(?=$|[\\s\\p{P}])")
     fun hasCommand(finalText: String) = command.containsMatchIn(finalText)
     fun clean(text: String): String {
-        val cleaned = Regex("녹음\\s*[,，]?\\s*끝").replace(text, " ").replace(Regex("\\s+"), " ").trim()
+        val cleaned = Regex("녹음\\s*[,，]?\\s*끝(?=$|[\\s\\p{P}])").replace(text, " ").replace(Regex("\\s+"), " ").trim()
         return if (cleaned.all { it.isWhitespace() || it in ".,!?。！？" }) "" else cleaned
     }
     fun title(text: String, date: Long) = clean(text).take(20).ifBlank { "음성 메모 ${formatDate(date)}" }
