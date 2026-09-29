@@ -81,6 +81,7 @@ class MainActivity : ComponentActivity() {
                     Spacer(Modifier.height(28.dp))
                     Text(if (rec.saving) "저장하고 있습니다…" else "듣고 있습니다...", fontSize = 28.sp, fontWeight = FontWeight.Bold)
                     Spacer(Modifier.height(16.dp)); Text("'녹음 끝'이라고 말하면 저장됩니다.")
+                    if (!rec.saving) Text("잠깐 쉬고 '녹음 끝'을 말한 뒤 2초 정도 기다려 주세요.", modifier = Modifier.padding(top = 8.dp), color = Color.Gray)
                     Spacer(Modifier.height(24.dp)); Text(duration(rec.elapsed), fontSize = 42.sp, color = MaterialTheme.colorScheme.primary)
                     if (rec.message.isNotBlank()) Text(rec.message, modifier = Modifier.padding(vertical = 20.dp))
                     if (rec.text.isNotBlank()) Text(rec.text.takeLast(180), modifier = Modifier.padding(vertical = 16.dp))
